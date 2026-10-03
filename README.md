@@ -268,6 +268,6 @@ SQL для створення вибірки: `sales_lines.sql`.
 
 ## Посилання
 
-- Датасет: **Pizza Place Sales — Kaggle**
-- Дашборд: `[Tableau Public URL — додати після публікації]`
-- Презентація: `presentation/index.html`
+- Датасет: **Pizza Place Sales — Kaggle** https://www.kaggle.com/datasets/mysarahmadbhat/pizza-place-sales
+- Дашборд: https://public.tableau.com/views/pizza_dashboard_17910344805020/PizzaSalesAnalysis2015?:language=en-US&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link
+
