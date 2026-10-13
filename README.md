@@ -1,162 +1,209 @@
 # Pizza Sales Analysis — 2015
 
-## Завдання
+## Task
 
-Проєкт виконано на основі відкритого датасету **Pizza Place Sales** з Kaggle. Він містить дані про продажі вигаданої піцерії за **2015 рік** у чотирьох пов’язаних таблицях.
+This project analyzes the 2015 sales data of a pizzeria using SQL and Tableau.
 
-Бізнес-контекст: нова власниця піцерії Лаура Мартінес хоче на основі історичних продажів ухвалити три рішення:
+The goal was to help the new owner, Laura Martinez, make data-driven business decisions based on historical sales.
 
-- як скласти графік змін, щоб не тримати зайвих працівників у тихі години й мати достатньо персоналу в пікові;
-- які піци можна розглянути для скорочення меню;
-- коли та яку акцію варто протестувати, щоб підсилити слабкі дні та години.
+The analysis focuses on three main business areas:
 
-У межах аналізу потрібно було відповісти на 8 ключових питань щодо KPI, сезонності, навантаження, популярності піц, структури виручки, слабких позицій меню, великих замовлень і промоакції.
+- staffing and workload planning;
+- menu optimization;
+- promotion opportunities.
 
-## Дані
+Additional analysis was performed to evaluate large orders and the potential for group or corporate offers.
 
-Датасет складається з чотирьох таблиць:
-
-- `orders` — ID замовлення, дата та час;
-- `order_details` — ID рядка замовлення, ID замовлення, ID піци та кількість;
-- `pizzas` — ID піци певного розміру, ID типу піци, розмір і ціна;
-- `pizza_types` — ID типу піци, назва, категорія та інгредієнти.
-
-**Період:** 2015 рік.
-
-У SQL було виконано первинну перевірку:
-
-- кількості рядків у кожній таблиці;
-- пропусків;
-- коректності дат і часу;
-- числових полів `price` та `quantity`;
-- JOIN між усіма чотирма таблицями;
-- некоректних або недодатних значень.
-
-Для розрахунків:
-- `price` приводиться до числового типу через `CAST(... AS REAL)`;
-- `quantity` — через `CAST(... AS INTEGER)`.
-
-Для Tableau створено VIEW `sales_lines`, який об’єднує всі 4 таблиці.
-
-**Кількість рядків у `sales_lines`: 48 620.**  
-Один рядок = одна позиція замовлення.
-
-Поля `sales_lines`:
-
-`order_id`, `order_date`, `order_time`, `month`, `weekday`, `hour`, `pizza_name`, `category`, `size`, `unit_price`, `quantity`, `revenue`.
-
-SQL для створення вибірки: `sales_lines.sql`.
-
-> Примітка: у поточних матеріалах збережено SQL для перевірки кількості рядків у кожній вихідній таблиці, але не окремо зафіксовано результати цієї перевірки. Тому в README не додаються неперевірені значення.
-
-## Ключові питання та відповіді
-
-### 1. Загальні показники за рік
-
-**Питання:**  
-Яка загальна виручка за рік, кількість замовлень, кількість проданих піц, середній чек та середня кількість піц у замовленні?
-
-**Відповідь:**  
-За 2015 рік піцерія отримала **$817,860.05** виручки з **21,350 замовлень**. Було продано **49,574 піци**. Середній чек становив **$38.31**, а середня кількість піц у замовленні — **2.32**.
-
-**SQL:** `sql/queries.sql`
+The project answers eight key business questions related to sales performance, seasonality, customer demand, product performance, menu optimization, large orders, and promotion opportunities.
 
 ---
 
-### 2. Динаміка по місяцях
+## Data
 
-**Питання:**  
-Яка динаміка виручки та кількості замовлень по місяцях? Який місяць найсильніший, а який найслабший? Як змінювалася виручка порівняно з попереднім місяцем?
+The dataset covers the full year of **2015** and consists of four related tables:
 
-**Відповідь:**  
-Найсильнішим місяцем за виручкою був **липень — $72,557.90** при **1,935 замовленнях**. Найслабшим був **жовтень — $64,027.60** при **1,646 замовленнях**.
+- `orders`
+- `order_details`
+- `pizzas`
+- `pizza_types`
 
-Найбільше зростання виручки порівняно з попереднім місяцем відбулося в **листопаді — +9.95%**, а в **грудні виручка знизилася на 8.09%** порівняно з листопадом.
+The table relationships are:
 
-**SQL:** `sql/queries.sql`
+- `orders 1:N order_details`
+- `order_details N:1 pizzas`
+- `pizzas N:1 pizza_types`
 
----
+The tables are connected through primary and foreign keys.
 
-### 3. Навантаження за днями тижня та годинами
+The original project data is stored in:
 
-**Питання:**  
-Як розподіляється навантаження за днями тижня та годинами? Коли спостерігається найбільша і найменша кількість замовлень? Скільки замовлень у середньому припадає на один день кожного типу?
+[`data/`](data/)
 
-**Відповідь:**  
-Найбільш завантаженим днем є **п’ятниця — у середньому 70.76 замовлення за день**, а найменш завантаженим — **неділя — 50.46 замовлення за день**.
+### Data Preparation
 
-За годинами найбільше замовлень припадає на **12:00 — 2,520 замовлень за рік**. Високе навантаження також спостерігається в обідній період **12:00–13:00** та ввечері приблизно **17:00–19:00**.
+Before the analysis, the data was checked for:
 
-Найбільш завантажена конкретна комбінація — **четвер о 13:00: 438 замовлень за рік**. В основний робочий час найменше навантаження переважно спостерігається наприкінці дня, особливо близько **22:00**.
+- missing values;
+- row counts;
+- date and time formats;
+- price and quantity formats;
+- consistency of table relationships;
+- possible duplication after joins.
 
-**SQL:** `sql/queries.sql`
+The four source tables were combined using SQL `JOIN`.
 
----
+Data types were standardized using `CAST`:
 
-### 4. Бестселери та аутсайдери
+- `price` → `REAL`
+- `quantity` → `INTEGER`
 
-**Питання:**  
-Які TOP-5 і BOTTOM-5 піц за виручкою та за кількістю проданих піц на рівні назви, якщо всі розміри об’єднати? Чи збігаються ці списки?
+Date and time components were extracted using `strftime()`.
 
-**Відповідь:**  
+For Tableau, a SQL view called `sales_lines` was created.
 
-**TOP-5 за виручкою:**
+The complete SQL code, including the analytical queries and the creation of the Tableau data source, is stored in:
 
-1. The Thai Chicken Pizza — **$43,434.25**
-2. The Barbecue Chicken Pizza — **$42,768.00**
-3. The California Chicken Pizza — **$41,409.50**
-4. The Classic Deluxe Pizza — **$38,180.50**
-5. The Spicy Italian Pizza — **$34,831.25**
+[`sql/queries.sql`](sql/queries.sql)
 
-**TOP-5 за кількістю продажів:**
+The `sales_lines` view contains **48,620 rows**, where one row represents one order line.
 
-1. The Classic Deluxe Pizza — **2,453**
-2. The Barbecue Chicken Pizza — **2,432**
-3. The Hawaiian Pizza — **2,422**
-4. The Pepperoni Pizza — **2,418**
-5. The Thai Chicken Pizza — **2,371**
+The exported dataset used for Tableau is stored separately as:
 
-**BOTTOM-5 за виручкою:**
+[`exports/sales_lines.csv`](exports/sales_lines.csv)
 
-1. The Brie Carre Pizza — **$11,588.50**
-2. The Green Garden Pizza — **$13,955.75**
-3. The Spinach Supreme Pizza — **$15,277.75**
-4. The Mediterranean Pizza — **$15,360.50**
-5. The Spinach Pesto Pizza — **$15,595.00**
+Dataset source:
 
-**BOTTOM-5 за кількістю продажів:**
-
-1. The Brie Carre Pizza — **490**
-2. The Mediterranean Pizza — **934**
-3. The Calabrese Pizza — **937**
-4. The Spinach Supreme Pizza — **950**
-5. The Soppressata Pizza — **961**
-
-Списки збігаються частково. Серед лідерів **The Thai Chicken Pizza, The Barbecue Chicken Pizza та The Classic Deluxe Pizza** входять до TOP-5 за обома показниками. Серед аутсайдерів **The Brie Carre Pizza, The Mediterranean Pizza та The Spinach Supreme Pizza** входять до BOTTOM-5 за обома показниками.
-
-Найслабша позиція за обома показниками — **The Brie Carre Pizza**.
-
-**SQL:** `sql/queries.sql`
+https://www.kaggle.com/datasets/mysarahmadbhat/pizza-place-sales
 
 ---
 
-### 5. Категорії та розміри
+## Key Questions and Answers
 
-**Питання:**  
-Яка частка виручки кожної категорії та кожного розміру? Які розміри продаються найкраще?
+All SQL queries for the eight business questions are stored in:
 
-**Відповідь:**  
+[`sql/queries.sql`](sql/queries.sql)
 
-Частка виручки за категоріями:
+### 1. What are the main sales KPIs?
+
+The main sales results for 2015 are:
+
+- Total Revenue: **$817,860.05**
+- Total Orders: **21,350**
+- Pizzas Sold: **49,574**
+- Average Order Value: **$38.31**
+- Average Pizzas per Order: **2.32**
+
+The Average Order Value was calculated as total revenue divided by the number of distinct orders.
+
+`COUNT(DISTINCT order_id)` was used to ensure that each order was counted only once.
+
+SQL: [`sql/queries.sql`](sql/queries.sql)
+
+---
+
+### 2. Which months performed best and worst?
+
+The strongest month was **July**:
+
+- Revenue: **$72,557.90**
+- Orders: **1,935**
+
+The weakest month was **October**:
+
+- Revenue: **$64,027.60**
+- Orders: **1,646**
+
+The SQL window function `LAG()` was used to compare each month with the previous month.
+
+The largest positive month-over-month revenue increase was:
+
+- **November: +9.95%**
+
+December showed a decline of:
+
+- **−8.09%**
+
+Overall seasonality was moderate, but October was the weakest month by revenue.
+
+SQL: [`sql/queries.sql`](sql/queries.sql)
+
+---
+
+### 3. When is customer demand highest and lowest?
+
+The strongest weekday was:
+
+- **Friday — 70.76 orders per day**
+
+The weakest weekday was:
+
+- **Sunday — 50.46 orders per day**
+
+The main demand peaks were:
+
+- **12:00–13:00**
+- **17:00–19:00**
+
+The strongest weekday-hour combination was:
+
+- **Thursday at 13:00 — 438 orders**
+
+The hour with the highest total number of orders was:
+
+- **12:00 — 2,520 orders**
+
+Demand was much lower around **22:00**.
+
+### Business implication
+
+Staffing should be strengthened on Fridays and during lunch and evening peak periods.
+
+Lower staffing levels may be considered around 22:00, but this should be validated with actual staffing data.
+
+SQL: [`sql/queries.sql`](sql/queries.sql)
+
+---
+
+### 4. Which pizzas are the strongest and weakest performers?
+
+The highest-revenue pizza was:
+
+- **The Thai Chicken Pizza — $43,434.25**
+
+The best-selling pizza by quantity was:
+
+- **The Classic Deluxe Pizza — 2,453 pizzas**
+
+The weakest pizza by both revenue and quantity was:
+
+- **The Brie Carre Pizza**
+- **490 pizzas sold**
+- **$11,588.50 revenue**
+
+The Top 5 pizzas by revenue were:
+
+- The Thai Chicken Pizza
+- The Barbecue Chicken Pizza
+- The California Chicken Pizza
+- The Classic Deluxe Pizza
+- The Spicy Italian Pizza
+
+SQL ranking logic, including `RANK()`, was used to compare product performance.
+
+SQL: [`sql/queries.sql`](sql/queries.sql)
+
+---
+
+### 5. How is revenue distributed across categories and sizes?
+
+Revenue by category was relatively balanced:
 
 - Classic — **26.91%**
 - Supreme — **25.46%**
 - Chicken — **23.96%**
 - Veggie — **23.68%**
 
-Найбільшу частку виручки приносить категорія **Classic — 26.91% ($220,053.10)**, але загалом виручка між категоріями розподілена досить рівномірно.
-
-Частка виручки за розмірами:
+Revenue by size:
 
 - L — **45.89%**
 - M — **30.49%**
@@ -164,110 +211,247 @@ SQL для створення вибірки: `sales_lines.sql`.
 - XL — **1.72%**
 - XXL — **0.12%**
 
-Найкраще продається розмір **L**: **18,956 піц** і **45.89% загальної виручки ($375,318.70)**. XL і XXL разом дають менше 2% виручки.
+Size **L** was the most important size:
 
-**SQL:** `sql/queries.sql`
+- **18,956 pizzas sold**
+- **$375,318.70 revenue**
+- **45.89% of total revenue**
 
----
+XL and XXL together generated less than 2% of total revenue.
 
-### 6. Кандидати на вилучення з меню
-
-**Питання:**  
-Які піци мають найменшу частку виручки й найменші продажі? Які 3–5 позицій можна прибрати і скільки виручки це зачепить?
-
-**Відповідь:**  
-Кандидатами на скорочення меню є:
-
-- The Brie Carre Pizza
-- The Green Garden Pizza
-- The Spinach Supreme Pizza
-- The Mediterranean Pizza
-- The Spinach Pesto Pizza
-
-Разом ці 5 позицій принесли **$71,778.50**, або **8.78% загальної виручки**.
-
-Найслабшою є **The Brie Carre Pizza** — **490 проданих піц**, **$11,588.50 виручки** та **1.42% загальної виручки**.
-
-Ці позиції можна розглядати як кандидатів на скорочення меню, але перед остаточним рішенням потрібно також врахувати собівартість, маржу та унікальність інгредієнтів.
-
-**SQL:** `sql/queries.sql`
+SQL: [`sql/queries.sql`](sql/queries.sql)
 
 ---
 
-### 7. Великі замовлення
+### 6. Which menu items should be reviewed?
 
-**Питання:**  
-Яка частка замовлень містить 4 і більше піц і скільки виручки вони дають? Чи варто робити окрему пропозицію для компаній?
+Five pizzas were identified as low-selling and low-revenue candidates for further review:
 
-**Відповідь:**  
-Замовлення з **4 і більше піцами** становлять **18.17% усіх замовлень — 3,880 із 21,350**, але приносять **$322,570.90**, або **39.44% загальної виручки**.
+1. The Brie Carre Pizza — **$11,588.50**
+2. The Green Garden Pizza — **$13,955.75**
+3. The Spinach Supreme Pizza — **$15,277.75**
+4. The Mediterranean Pizza — **$15,360.50**
+5. The Spinach Pesto Pizza — **$15,595.00**
 
-Великі замовлення формують значно більшу частку виручки, ніж їхня частка в кількості замовлень. Тому окрему пропозицію для компаній варто протестувати, наприклад спеціальні набори або бонуси для замовлень від 4 піц.
+Together, these five pizzas generated:
 
-**SQL:** `sql/queries.sql`
+- **$71,778.50**
+- **8.78% of total revenue**
+
+These products should **not be removed automatically**.
+
+Before making a final menu decision, the following factors should also be analyzed:
+
+- food cost;
+- profit margin;
+- ingredient overlap;
+- ingredient uniqueness;
+- customer behavior.
+
+The sales analysis identifies candidates for further review rather than final removal decisions.
+
+SQL: [`sql/queries.sql`](sql/queries.sql)
 
 ---
 
-### 8. Акція
+### 7. How important are large orders?
 
-**Питання:**  
-У який день і годину варто запустити акцію для підвищення трафіку? Яку конкретну акцію можна запропонувати та який її потенціал?
+Large orders were defined as orders containing **4 or more pizzas**.
 
-**Відповідь:**  
-Для тестової акції можна обрати **понеділок о 22:00**, оскільки серед основних робочих годин **11:00–22:00** це одне з найслабших часових вікон.
+They represent:
 
-Поточні показники цього вікна:
+- **3,880 of 21,350 orders**
+- **18.17% of all orders**
 
-- **53 замовлення за рік**
-- поточна виручка — **$1,869.05**
-- потенційний приріст при +10% — **$186.91**
-- потенційна виручка — **$2,055.96**
+However, they generate:
 
-Як тест можна запустити промо в понеділок о 22:00 і перевірити, чи дає воно реальний приріст замовлень та виручки.
+- **$322,570.90 revenue**
+- **39.44% of total revenue**
 
-**SQL:** `sql/queries.sql`
+Orders containing 1–3 pizzas generate:
 
-## Рекомендації для бізнесу
+- **$495,289.15**
+- **60.56% of total revenue**
 
-### 1. Графік змін
+For this analysis, pizza quantity was first aggregated at order level and then classified using `CASE`.
 
-Планувати більше персоналу в періоди пікового навантаження — насамперед **у п’ятницю**, в обідній період **12:00–13:00** та ввечері **17:00–19:00**.
+### Business implication
 
-У тихі години, особливо наприкінці дня близько **22:00**, можна розглядати меншу кількість працівників, якщо це не погіршує якість сервісу.
+Large orders represent a relatively small share of all orders but generate a disproportionately high share of revenue.
 
-### 2. Меню
+This indicates potential for:
 
-Переглянути 5 слабких позицій:
+- group packages;
+- corporate offers;
+- incentives for orders of 4 or more pizzas.
 
-- The Brie Carre Pizza
-- The Green Garden Pizza
-- The Spinach Supreme Pizza
-- The Mediterranean Pizza
-- The Spinach Pesto Pizza
+SQL: [`sql/queries.sql`](sql/queries.sql)
 
-Разом вони формують **8.78% загальної виручки**. Перед остаточним вилученням варто перевірити їхню маржинальність, собівартість та унікальність інгредієнтів.
+---
 
-### 3. Промоакція
+### 8. When could a promotion be tested?
 
-Протестувати акцію у слабкому часовому вікні **понеділок 22:00**.
+A weak time window was identified at:
 
-Поточна виручка цього вікна — **$1,869.05**. За сценарію зростання на 10% потенційна виручка становитиме близько **$2,055.96**, тобто приріст — приблизно **$186.91**.
+- **Monday at 22:00**
 
-Це сценарна оцінка, тому результат потрібно перевірити фактичним тестом.
+Historical performance in this time slot:
 
-## Обмеження і наступні кроки
+- Orders: **53**
+- Current Revenue: **$1,869.05**
 
-- Аналіз базується лише на даних за **2015 рік**.
-- У датасеті немає даних про **собівартість, маржу та прибуток** по кожній піці.
-- Немає даних про **кількість працівників, графіки змін та фактичне навантаження персоналу**.
-- Рекомендація щодо вилучення позицій базується на продажах і виручці, але не враховує собівартість та унікальність інгредієнтів.
-- Оцінка **+10%** для промо є сценарною, а не результатом A/B-тесту.
-- Перед зміною меню бажано додати дані про `food cost`, маржу та списання інгредієнтів.
-- Для перевірки ефективності акції варто провести тест і порівняти результат із базовим періодом.
-- Для точнішого планування змін бажано поєднати продажі з даними про штат і фактичні години роботи персоналу.
+A scenario with a 10% revenue increase would result in:
 
-## Посилання
+- Additional Revenue: **$186.91**
+- Potential Revenue: **$2,055.96**
 
-- Датасет: **Pizza Place Sales — Kaggle** https://www.kaggle.com/datasets/mysarahmadbhat/pizza-place-sales
-- Дашборд: https://public.tableau.com/views/pizza_dashboard_17910344805020/PizzaSalesAnalysis2015?:language=en-US&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link
+The 10% increase is a **scenario, not a forecast**.
 
+There is no historical evidence that a promotion would actually increase revenue by 10%.
+
+The real effect should therefore be measured through a controlled promotion test.
+
+SQL: [`sql/queries.sql`](sql/queries.sql)
+
+---
+
+## Tools
+
+### SQL
+
+SQL was used for data preparation, aggregation, ranking, time analysis, business calculations, and preparation of the Tableau data source.
+
+Main SQL techniques:
+
+- `JOIN`
+- `GROUP BY`
+- `HAVING`
+- `CASE`
+- CTE
+- subqueries
+- `COUNT(DISTINCT)`
+- `CAST`
+- `strftime()`
+- `LAG()`
+- `RANK()`
+- `SUM() OVER`
+- `CREATE VIEW`
+
+The complete SQL script is stored in:
+
+[`sql/queries.sql`](sql/queries.sql)
+
+This file contains:
+
+- data preparation logic;
+- all eight business analysis queries;
+- the SQL code used to create the `sales_lines` view for Tableau.
+
+The exported Tableau dataset is stored in:
+
+[`exports/sales_lines.csv`](exports/sales_lines.csv)
+
+### Tableau
+
+Tableau was used to visualize the results and create two dashboards.
+
+#### Dashboard 1 — Pizza Sales Analysis — 2015
+
+Includes:
+
+- Revenue
+- Orders
+- Pizzas Sold
+- Average Order Value
+- Monthly Trend
+- Weekday × Hour Heatmap
+- Top 5 Pizzas by Revenue
+- Bottom 5 Pizzas by Revenue
+- Revenue by Category
+- Revenue by Size
+
+Interactive filters:
+
+- Month
+- Category
+- Size
+
+#### Dashboard 2 — Business Recommendations
+
+Includes:
+
+- Menu Removal Candidates
+- Large Orders
+- Promotion Opportunity
+
+Tableau techniques used in the project include:
+
+- Calculated Fields
+- FIXED LOD expressions
+- filters
+- KPI visualizations
+- heatmaps
+- rankings
+- interactive dashboards
+
+The Tableau workbook is stored in:
+
+[`Tableau/`](Tableau/)
+
+---
+
+## Business Recommendations
+
+Based on the analysis:
+
+- Increase staffing on **Fridays** and during the main demand peaks at **12:00–13:00** and **17:00–19:00**.
+- Consider lower staffing levels around **22:00**, subject to actual staffing data.
+- Review the five weakest pizzas, but do not remove them before checking **food cost, margin, ingredients, and customer behavior**.
+- Test special offers for orders of **4 or more pizzas**, since this segment generates **39.44% of total revenue**.
+- Test a promotion on **Monday at 22:00** and measure the actual impact before permanent implementation.
+
+---
+
+## Limitations and Next Steps
+
+### Limitations
+
+- The analysis covers only one year: **2015**.
+- Food cost data is not available.
+- Profit margin data is not available.
+- Staffing and actual shift-hour data are not available.
+- The 10% promotion uplift is a scenario, not an A/B test result.
+
+### Next Steps
+
+- Add food cost and margin data for each pizza.
+- Analyze ingredient overlap and ingredient uniqueness for weak menu items.
+- Run a real promotion test for Monday at 22:00.
+- Compare customer demand with actual staffing levels.
+- Test group or corporate offers for orders of 4 or more pizzas.
+- Measure the effect of these actions on both revenue and profitability.
+
+---
+
+## Links
+
+- **Tableau Public Dashboard:**  
+  https://public.tableau.com/views/pizza_dashboard_17910344805020/PizzaSalesAnalysis2015
+
+- **Dataset:**  
+  https://www.kaggle.com/datasets/mysarahmadbhat/pizza-place-sales
+
+- **SQL Queries and Tableau Data Preparation:**  
+  [`sql/queries.sql`](sql/queries.sql)
+
+- **Tableau Export Dataset:**  
+  [`exports/sales_lines.csv`](exports/sales_lines.csv)
+
+- **Tableau Workbook:**  
+  [`Tableau/`](Tableau/)
+
+- **Presentation:**  
+  [`presentation/`](presentation/)
+
+- **Data Dictionary:** 
+  [`docs/data_dictionary.md`](docs/data_dictionary.md)
