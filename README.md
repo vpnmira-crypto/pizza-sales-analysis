@@ -455,3 +455,19 @@ Based on the analysis:
 
 - **Data Dictionary:** 
   [`docs/data_dictionary.md`](docs/data_dictionary.md)
+
+  ## Author and Copyright
+
+**Project:** Pizza Sales Analysis — 2015
+
+**Author:** [vpnmira-crypto]
+
+**Year:** 2026
+
+**Institution:** Deutsche Tech Akademie
+
+This educational project includes my original SQL analysis, Tableau dashboards, business recommendations, and presentation.
+
+© 2026 [vpnmira-crypto]. All rights reserved for my original work.
+
+The original Pizza Place Sales dataset is sourced from Kaggle and remains subject to its own terms.
